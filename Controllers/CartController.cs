@@ -18,13 +18,13 @@ namespace ShoppingCart.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> AddProduct(int productId, int quantity)
         {
-            var product = await _context.Products.FindAsync(productId);
+            Product? product = await _context.Products.FindAsync(productId);
             if (product == null)
             {
                 return NotFound();
             }
 
-            var existingCartItem = await _context.CartItems.FirstOrDefaultAsync(item => item.Product.Id == productId);
+            CartItem? existingCartItem = await _context.CartItems.FirstOrDefaultAsync(item => item.Product.Id == productId);
 
             if (existingCartItem != null)
             {
@@ -33,7 +33,7 @@ namespace ShoppingCart.Controllers
             }
             else
             {
-                var cartItem = new CartItem { Product = product, Quantity = quantity };
+                CartItem cartItem = new CartItem { Product = product, Quantity = quantity };
                 _context.CartItems.Add(cartItem);
             }
 
@@ -60,11 +60,11 @@ namespace ShoppingCart.Controllers
         public async Task<ActionResult<CartState>> GetCartSate()
         {
             var cartItem = await _context.CartItems.Include(item => item.Product).ToListAsync();
-            var subtotal = cartItem.Sum(item => item.Product.Price * item.Quantity);
-            var tax = subtotal * 0.125m;
-            var total = subtotal + tax;
+            decimal subtotal = cartItem.Sum(item => item.Product.Price * item.Quantity);
+            decimal tax = subtotal * 0.125m;
+            decimal total = subtotal + tax;
 
-            var cartState = new CartState
+            CartState cartState = new CartState
             {
                 Items = cartItem,
                 Subtotal = subtotal,

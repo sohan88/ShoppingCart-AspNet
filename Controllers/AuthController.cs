@@ -17,7 +17,7 @@ public class AuthController(IConfiguration configuration) : ControllerBase
         // For demo purpose we assume valid credentials
         if (userLogin.Username != "testUser" || userLogin.Password != "testPasswd")
             return Task.FromResult<IActionResult>(Unauthorized());
-        var token = GenerateJwtToken(userLogin.Username);
+        string token = GenerateJwtToken(userLogin.Username);
         return Task.FromResult<IActionResult>(Ok(new JwtResponse
             { Token = token, Expiration = DateTime.UtcNow.AddHours(1).ToString(CultureInfo.InvariantCulture) }));
     }
@@ -55,9 +55,9 @@ public class AuthController(IConfiguration configuration) : ControllerBase
         //     new Claim("username", userName)
         // };
         
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"] ?? string.Empty);
-        var tokenDescriptor = new SecurityTokenDescriptor
+        JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+        byte[] key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"] ?? string.Empty);
+        SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
@@ -67,8 +67,8 @@ public class AuthController(IConfiguration configuration) : ControllerBase
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
+        SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+        string tokenString = tokenHandler.WriteToken(token);
         return tokenString;
     }
 }

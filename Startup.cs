@@ -7,14 +7,9 @@ using ShoppingCart.Data;
 
 namespace ShoppingCart
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        public IConfiguration Configuration { get; }
-
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        private IConfiguration Configuration { get; } = configuration;
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -25,7 +20,7 @@ namespace ShoppingCart
             // Register the MVC services
             services.AddControllers();
 
-            var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"] ?? throw new InvalidOperationException());
+            byte[] key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"] ?? throw new InvalidOperationException());
             
 
             services.AddAuthentication(auth =>
@@ -79,7 +74,7 @@ namespace ShoppingCart
                                 Id = "Bearer"
                             }
                         },
-                        new string[] { }
+                        Array.Empty<string>()
                     }
                 });
             });

@@ -21,7 +21,7 @@ namespace ShoppingCart.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerator<Product>>> GetProducts()
         {
-            var products = await _context.Products.ToListAsync();
+            List<Product> products = await _context.Products.ToListAsync();
             return Ok(products);
         }
 
